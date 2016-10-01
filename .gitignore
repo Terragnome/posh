@@ -1,0 +1,6 @@
+.DS_Store
+*.meta
+*.log
+Library/metadata
+Library/ShaderCache
+Temp

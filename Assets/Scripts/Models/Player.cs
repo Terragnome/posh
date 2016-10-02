@@ -91,7 +91,7 @@ public class Player : MonoBehaviour {
 			GameObject avatar = this.gameObject.transform.GetChild(0).gameObject;
 			avatar.transform.rotation = Quaternion.Lerp(
 				avatar.transform.rotation,
-				Quaternion.LookRotation(moveVector, Vector3.up),
+				Quaternion.LookRotation(moveVector*-1, Vector3.up),
 				turnSpeed*dT
 			);
 

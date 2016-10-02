@@ -12,7 +12,7 @@ public class Player : MonoBehaviour {
 	float dashTimeLeft = 0f;
 	bool isDashing = false;
 
-	float useDistance = 100f;
+	float useDistance = 1.25f;
 	Workstation useTarget = null;
 	bool isUsing = false;
 
@@ -30,27 +30,38 @@ public class Player : MonoBehaviour {
 		}
 	}
 
+	bool CloseEnough(Vector3 position, float distance){
+		Vector3 distVector = this.gameObject.transform.position-position;
+		return distVector.sqrMagnitude <= distance*distance;
+	}
+
 	void UpdateUse(float dT){
-		isUsing = Input.GetKey(KeyCode.Space);
-		if(isUsing){
-			if( useTarget == null){
-				Debug.Log("Find Target");
-
-			    Collider[] hitColliders = Physics.OverlapSphere(
-			    	this.gameObject.transform.position,
-			    	useDistance
-			    );
-
-		        for(int i =0; i<hitColliders.Length; i++) {
-		        	Workstation curStation = hitColliders[i].gameObject.GetComponent(typeof(Workstation)) as Workstation;
-		            Debug.Log( curStation );
-		            i++;
-		        }
-			}else{
-
+		bool checkUse = Input.GetKey(KeyCode.Space);
+		if(checkUse){
+			if( useTarget != null ){				
+				if(CloseEnough(useTarget.transform.position, useDistance)){
+					useTarget.Use(dT);
+				}else{
+					useTarget = null;					
+				}
 			}
 
+			if( useTarget == null){
+				GameObject[] workstations = GameObject.FindGameObjectsWithTag("Workstation");
+
+				foreach(GameObject curGO in workstations){
+					if(CloseEnough(curGO.transform.position, useDistance)){
+						Workstation curTarget = curGO.GetComponent(typeof(Workstation)) as Workstation;
+						useTarget = curTarget;
+		            	break;
+					}
+		        }
+			}
+		}else{
+			useTarget = null;
 		}
+
+		isUsing = useTarget != null;
 	}
 
 	void UpdateMovement(float dT) {

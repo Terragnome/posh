@@ -3,17 +3,18 @@ using System.Collections;
 
 public class Player : MonoBehaviour {
 	float walkSpeed = 3f;
-	bool isWalking = false;
-
 	float turnSpeed = 7f;
-
 	float dashSpeed = 6f;
 	float dashDuration = 0.3f;
 	float dashTimeLeft = 0f;
+	bool isWalking = false;
 	bool isDashing = false;
 
+	float liftDistance = 1.25f;
+	Liftable liftTarget = null;
+
 	float useDistance = 1.25f;
-	Workstation useTarget = null;
+	Usable useTarget = null;
 	bool isUsing = false;
 
   	// Use this for initialization
@@ -23,35 +24,57 @@ public class Player : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		float dT = Time.deltaTime;
-		UpdateUse(dT);
 
-		if(!isUsing){
-			UpdateMovement(dT);
-		}
+		UpdateUse(dT);
+		if(isUsing) return;
+
+		UpdateLift(dT);
+
+		UpdateMovement(dT);
 	}
 
-	bool CloseEnough(Vector3 position, float distance){
+	bool CloseEnough(Vector3 position, float distance) {
 		Vector3 distVector = this.gameObject.transform.position-position;
 		return distVector.sqrMagnitude <= distance*distance;
 	}
 
-	void UpdateUse(float dT){
-		bool checkUse = Input.GetKey(KeyCode.Space);
+	GameObject GetAvatar() {
+		return this.gameObject.transform.GetChild(0).gameObject;
+	}
+
+	void UpdateLookAt(Vector3 lookVector, float dT, float lookSpeed=1f) {
+		GameObject avatar = GetAvatar();
+		avatar.transform.rotation = Quaternion.Lerp(
+			avatar.transform.rotation,
+			Quaternion.LookRotation(lookVector*-1, Vector3.up),
+			lookSpeed*dT
+		);
+	}
+
+	void UpdateLookAtPosition(Vector3 position, float dT, float lookSpeed=1f) {
+		Vector3 lookVector = Vector3.Normalize(position-this.gameObject.transform.position);
+		lookVector.y = 0f;
+		UpdateLookAt(lookVector, dT, lookSpeed);
+	}
+
+	void UpdateUse(float dT) {
+		bool checkUse = Input.GetKey(KeyCode.F);
 		if(checkUse){
 			if( useTarget != null ){				
 				if(CloseEnough(useTarget.transform.position, useDistance)){
 					useTarget.Use(dT);
+					UpdateLookAtPosition(useTarget.transform.position, dT, turnSpeed);
 				}else{
 					useTarget = null;					
 				}
 			}
 
 			if( useTarget == null){
-				GameObject[] workstations = GameObject.FindGameObjectsWithTag("Workstation");
+				GameObject[] usables = GameObject.FindGameObjectsWithTag(TagType.USABLE);
 
-				foreach(GameObject curGO in workstations){
+				foreach(GameObject curGO in usables){
 					if(CloseEnough(curGO.transform.position, useDistance)){
-						Workstation curTarget = curGO.GetComponent(typeof(Workstation)) as Workstation;
+						Usable curTarget = curGO.GetComponent(typeof(Usable)) as Usable;
 						useTarget = curTarget;
 		            	break;
 					}
@@ -62,6 +85,32 @@ public class Player : MonoBehaviour {
 		}
 
 		isUsing = useTarget != null;
+	}
+
+	void UpdateLift(float dT) {
+		bool checkLift = Input.GetKeyDown(KeyCode.Space);
+		if(checkLift){
+			if( liftTarget != null ){
+				Debug.Log("Drop!");
+				liftTarget.transform.parent = null;
+				liftTarget = null;
+			}else{
+				GameObject[] liftables = GameObject.FindGameObjectsWithTag(TagType.LIFTABLE);
+
+				foreach(GameObject curGO in liftables){
+					if(CloseEnough(curGO.transform.position, liftDistance)){
+						Debug.Log("Lift!");
+
+						GameObject avatar = GetAvatar();
+						curGO.transform.parent = avatar.transform;
+
+						Liftable curTarget = curGO.GetComponent(typeof(Liftable)) as Liftable;
+						liftTarget = curTarget;
+		            	break;
+					}
+		        }
+			}
+		}
 	}
 
 	void UpdateMovement(float dT) {
@@ -99,12 +148,7 @@ public class Player : MonoBehaviour {
 		moveVector = Vector3.Normalize(moveVector);
 
 		if(moveVector != Vector3.zero){
-			GameObject avatar = this.gameObject.transform.GetChild(0).gameObject;
-			avatar.transform.rotation = Quaternion.Lerp(
-				avatar.transform.rotation,
-				Quaternion.LookRotation(moveVector*-1, Vector3.up),
-				turnSpeed*dT
-			);
+			UpdateLookAt(moveVector, dT, turnSpeed);
 
 			this.gameObject.transform.Translate(moveVector*curMoveSpeed*dT);
 

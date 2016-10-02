@@ -1,20 +1,23 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Workstation : MonoBehaviour {
+public class Liftable : MonoBehaviour {
+
 	// Use this for initialization
 	void Start () {
+	
 	}
 	
 	// Update is called once per frame
 	void Update () {
+	
 	}
 
-	public void Use(float dT) {
-		UpdateProgress(dT);
+	public void Lift() {
+		Debug.Log("Lift!");
 	}
 
-	void UpdateProgress(float dT){
-		Debug.Log("Using!");
+	public void Drop() {
+		Debug.Log("Drop!");
 	}
 }

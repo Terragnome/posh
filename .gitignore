@@ -1,6 +1,9 @@
 .DS_Store
 *.meta
 *.log
+Library/AssetServerCacheV3
+Library/assetDatabase3
 Library/metadata
+Library/ScriptAssemblies
 Library/ShaderCache
 Temp

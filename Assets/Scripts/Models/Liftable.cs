@@ -15,7 +15,7 @@ public class Liftable : MonoBehaviour {
 	
 	}
 
-	public Rigidbody rigidbody {
+	Rigidbody rb {
 		get { return GetComponent<Rigidbody>(); }
 	}
 
@@ -24,17 +24,17 @@ public class Liftable : MonoBehaviour {
 			container.Clear();
 			container = null;
 		}
-		rigidbody.useGravity = false;
-		rigidbody.isKinematic = true;
+		rb.useGravity = false;
+		rb.isKinematic = true;
 	}
 
 	public void DropOn(Usable usable) {
 		container = usable;
-		this.gameObject.transform.position = container.gameObject.transform.position+Vector3.up;
+		transform.position = container.transform.position+Vector3.up;
 	}
 
 	public void Drop() {
-		rigidbody.isKinematic = false;
-		rigidbody.useGravity = true;
+		rb.isKinematic = false;
+		rb.useGravity = true;
 	}
 }

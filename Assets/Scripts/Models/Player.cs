@@ -29,7 +29,7 @@ public class Player : MonoBehaviour {
 	bool isUsing = false;
 
 	public GameObject avatar {
-	    get { return this.gameObject.transform.GetChild(0).gameObject; }
+	    get { return transform.GetChild(0).gameObject; }
 	}
 
 	public Vector3 avatarLiftPosition {
@@ -52,7 +52,7 @@ public class Player : MonoBehaviour {
 	}
 
 	bool CloseEnough(Vector3 position, float distance) {
-		Vector3 distVector = this.gameObject.transform.position-position;
+		Vector3 distVector = transform.position-position;
 		return distVector.sqrMagnitude <= distance*distance;
 	}
 
@@ -87,7 +87,7 @@ public class Player : MonoBehaviour {
 	}
 
 	void UpdateLookAtPosition(Vector3 position, float dT, float lookSpeed=1f) {
-		Vector3 lookVector = Vector3.Normalize(position-this.gameObject.transform.position);
+		Vector3 lookVector = Vector3.Normalize(position-transform.position);
 		lookVector.y = 0f;
 		UpdateLookAt(lookVector, dT, lookSpeed);
 	}
@@ -178,7 +178,7 @@ public class Player : MonoBehaviour {
 		if(moveVector != Vector3.zero){
 			UpdateLookAt(moveVector, dT, turnSpeed);
 
-			this.gameObject.transform.Translate(moveVector*curMoveSpeed*dT);
+			transform.Translate(moveVector*curMoveSpeed*dT);
 		}
 	}
 }

@@ -12,7 +12,7 @@ public class Usable : MonoBehaviour {
 	void Update () {
 	}
 
-	public bool IsFilled {
+	public bool isFilled {
 		get { return contents != null; }
 	}
 

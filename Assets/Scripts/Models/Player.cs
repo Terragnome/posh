@@ -58,9 +58,11 @@ public class Player : MonoBehaviour {
 
 	Usable GetClosestUsable(float useDistance) {
 		GameObject[] usables = GameObject.FindGameObjectsWithTag(TagType.USABLE);
+		Usable curUsable;
 		foreach(GameObject curGO in usables){
-			if(CloseEnough(curGO.transform.position, useDistance)){
-				return curGO.GetComponent<Usable>();
+			curUsable = curGO.GetComponent<Usable>();
+			if(!curUsable.isFilled && CloseEnough(curGO.transform.position, useDistance)){
+				return curUsable;
 			}
         }
         return null;
@@ -120,7 +122,7 @@ public class Player : MonoBehaviour {
 		if(checkLift){
 			if( liftTarget != null ){
 				Usable closestUsable = GetClosestUsable(useLiftedDistance);
-				if(closestUsable != null && !closestUsable.IsFilled){
+				if(closestUsable != null){
 					closestUsable.FillWith(liftTarget);
 					liftTarget.DropOn(closestUsable);
 				}else{

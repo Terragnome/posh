@@ -2,6 +2,8 @@
 using System.Collections;
 
 public class Liftable : MonoBehaviour {
+	Usable container = null;
+
 
 	// Use this for initialization
 	void Start () {
@@ -13,11 +15,26 @@ public class Liftable : MonoBehaviour {
 	
 	}
 
+	public Rigidbody rigidbody {
+		get { return GetComponent<Rigidbody>(); }
+	}
+
 	public void Lift() {
-		Debug.Log("Lift!");
+		if(container){
+			container.Clear();
+			container = null;
+		}
+		rigidbody.useGravity = false;
+		rigidbody.isKinematic = true;
+	}
+
+	public void DropOn(Usable usable) {
+		container = usable;
+		this.gameObject.transform.position = container.gameObject.transform.position+Vector3.up;
 	}
 
 	public void Drop() {
-		Debug.Log("Drop!");
+		rigidbody.isKinematic = false;
+		rigidbody.useGravity = true;
 	}
 }

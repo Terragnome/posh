@@ -2,20 +2,39 @@
 using System.Collections;
 
 public class Player : MonoBehaviour {
+	[SerializeField]
 	float walkSpeed = 3f;
+	[SerializeField]
 	float turnSpeed = 7f;
+	[SerializeField]
 	float dashSpeed = 6f;
+	[SerializeField]
 	float dashDuration = 0.3f;
+	[SerializeField]
 	float dashTimeLeft = 0f;
-	bool isWalking = false;
 	bool isDashing = false;
 
-	float liftDistance = 1.25f;
+	[SerializeField]
+	float liftDistance = 2.5f;
+	[SerializeField]
 	Liftable liftTarget = null;
 
-	float useDistance = 1.25f;
+	[SerializeField]
+	float useDistance = 1.5f;
+	[SerializeField]
+	float useLiftedDistance = 2.5f;
+	
+	[SerializeField]
 	Usable useTarget = null;
 	bool isUsing = false;
+
+	public GameObject avatar {
+	    get { return this.gameObject.transform.GetChild(0).gameObject; }
+	}
+
+	public Vector3 avatarLiftPosition {
+		get { return avatar.transform.position-avatar.transform.forward+Vector3.up; }
+	}
 
   	// Use this for initialization
 	void Start () {
@@ -29,7 +48,6 @@ public class Player : MonoBehaviour {
 		if(isUsing) return;
 
 		UpdateLift(dT);
-
 		UpdateMovement(dT);
 	}
 
@@ -38,12 +56,27 @@ public class Player : MonoBehaviour {
 		return distVector.sqrMagnitude <= distance*distance;
 	}
 
-	GameObject GetAvatar() {
-		return this.gameObject.transform.GetChild(0).gameObject;
+	Usable GetClosestUsable(float useDistance) {
+		GameObject[] usables = GameObject.FindGameObjectsWithTag(TagType.USABLE);
+		foreach(GameObject curGO in usables){
+			if(CloseEnough(curGO.transform.position, useDistance)){
+				return curGO.GetComponent<Usable>();
+			}
+        }
+        return null;
+	}
+
+	Liftable GetClosestLiftable(float liftDistance) {
+		GameObject[] liftables = GameObject.FindGameObjectsWithTag(TagType.LIFTABLE);
+		foreach(GameObject curGO in liftables){
+			if(CloseEnough(curGO.transform.position, liftDistance)){
+				return curGO.GetComponent<Liftable>();
+			}
+        }
+        return null;
 	}
 
 	void UpdateLookAt(Vector3 lookVector, float dT, float lookSpeed=1f) {
-		GameObject avatar = GetAvatar();
 		avatar.transform.rotation = Quaternion.Lerp(
 			avatar.transform.rotation,
 			Quaternion.LookRotation(lookVector*-1, Vector3.up),
@@ -70,15 +103,10 @@ public class Player : MonoBehaviour {
 			}
 
 			if( useTarget == null){
-				GameObject[] usables = GameObject.FindGameObjectsWithTag(TagType.USABLE);
-
-				foreach(GameObject curGO in usables){
-					if(CloseEnough(curGO.transform.position, useDistance)){
-						Usable curTarget = curGO.GetComponent(typeof(Usable)) as Usable;
-						useTarget = curTarget;
-		            	break;
-					}
-		        }
+				Usable curTarget = GetClosestUsable(useDistance);
+				if(curTarget){
+					useTarget = curTarget;
+				}
 			}
 		}else{
 			useTarget = null;
@@ -91,25 +119,25 @@ public class Player : MonoBehaviour {
 		bool checkLift = Input.GetKeyDown(KeyCode.Space);
 		if(checkLift){
 			if( liftTarget != null ){
-				Debug.Log("Drop!");
-				liftTarget.transform.parent = null;
+				Usable closestUsable = GetClosestUsable(useLiftedDistance);
+				if(closestUsable != null && !closestUsable.IsFilled){
+					closestUsable.FillWith(liftTarget);
+					liftTarget.DropOn(closestUsable);
+				}else{
+					liftTarget.Drop();
+				}
 				liftTarget = null;
 			}else{
-				GameObject[] liftables = GameObject.FindGameObjectsWithTag(TagType.LIFTABLE);
-
-				foreach(GameObject curGO in liftables){
-					if(CloseEnough(curGO.transform.position, liftDistance)){
-						Debug.Log("Lift!");
-
-						GameObject avatar = GetAvatar();
-						curGO.transform.parent = avatar.transform;
-
-						Liftable curTarget = curGO.GetComponent(typeof(Liftable)) as Liftable;
-						liftTarget = curTarget;
-		            	break;
-					}
-		        }
+				Liftable curTarget = GetClosestLiftable(liftDistance);
+				if(curTarget){
+					curTarget.Lift();
+					liftTarget = curTarget;
+				}
 			}
+		}
+
+		if(liftTarget != null){
+			liftTarget.transform.position = avatarLiftPosition;
 		}
 	}
 
@@ -120,8 +148,6 @@ public class Player : MonoBehaviour {
 		bool isWalkBack = Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S);
 		bool isWalkLeft = Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A);
 		bool isWalkRight = Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D);
-
-		isWalking = isWalkForward || isWalkBack || isWalkLeft || isWalkRight;
 
 		if( !isDashing ){
 			bool hasDashed = Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
@@ -151,12 +177,6 @@ public class Player : MonoBehaviour {
 			UpdateLookAt(moveVector, dT, turnSpeed);
 
 			this.gameObject.transform.Translate(moveVector*curMoveSpeed*dT);
-
-			Debug.DrawRay(
-				this.gameObject.transform.position,
-				moveVector*10,
-				Color.red
-			);
 		}
 	}
 }

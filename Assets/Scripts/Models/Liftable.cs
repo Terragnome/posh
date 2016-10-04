@@ -4,15 +4,12 @@ using System.Collections;
 public class Liftable : MonoBehaviour {
 	Usable container = null;
 
-
 	// Use this for initialization
 	void Start () {
-	
 	}
 	
 	// Update is called once per frame
 	void Update () {
-	
 	}
 
 	Rigidbody rb {
@@ -30,7 +27,7 @@ public class Liftable : MonoBehaviour {
 
 	public void DropOn(Usable usable) {
 		container = usable;
-		transform.position = container.transform.position+Vector3.up*container.transform.lossyScale.y;
+		GetComponent<Rigidbody>().MovePosition(container.transform.position+Vector3.up*container.transform.lossyScale.y);
 	}
 
 	public void Drop() {

@@ -43,7 +43,7 @@ public class Player : MonoBehaviour {
 	}
 
 	// Update is called once per frame
-	void Update () {
+	void FixedUpdate () {
 		float dT = Time.deltaTime;
 
 		UpdateUse(dT);
@@ -53,11 +53,11 @@ public class Player : MonoBehaviour {
 		UpdateMovement(dT);
 	}
 
-	void OnCollisionEnter(Collision collision) {
-        if(collision.gameObject.GetComponent<Usable>() != null) {
-        	collision.gameObject.GetComponent<Rigidbody>().isKinematic = false;
-        }
-	}
+	// void OnCollisionEnter(Collision collision) {
+ //        if(collision.gameObject.GetComponent<Usable>() != null) {
+ //        	collision.gameObject.GetComponent<Rigidbody>().isKinematic = false;
+ //        }
+	// }
 
 	Vector2 ToVector2(Vector3 v) {
 		return new Vector2(v.x, v.z);
@@ -65,7 +65,6 @@ public class Player : MonoBehaviour {
 
 	float DistanceSquared(Vector3 targetPosition) {
 		Vector2 distVector = ToVector2(avatar.transform.position) - ToVector2(targetPosition);
-		Debug.Log(distVector.sqrMagnitude);
 		return distVector.sqrMagnitude;
 	}
 
@@ -107,10 +106,12 @@ public class Player : MonoBehaviour {
 	}
 
 	void UpdateLookAt(Vector3 lookVector, float dT, float lookSpeed=1f) {
-		avatar.transform.rotation = Quaternion.Lerp(
-			avatar.transform.rotation,
-			Quaternion.LookRotation(lookVector*-1, Vector3.up),
-			lookSpeed*dT
+		GetComponent<Rigidbody>().MoveRotation(
+			Quaternion.Lerp(
+				avatar.transform.rotation,
+				Quaternion.LookRotation(lookVector*-1, Vector3.up),
+				lookSpeed*dT
+			)
 		);
 	}
 
@@ -170,7 +171,7 @@ public class Player : MonoBehaviour {
 		}
 
 		if(liftTarget != null){
-			liftTarget.transform.position = avatarLiftPosition;
+			liftTarget.GetComponent<Rigidbody>().MovePosition(avatarLiftPosition);
 		}
 	}
 
@@ -208,8 +209,7 @@ public class Player : MonoBehaviour {
 
 		if(moveVector != Vector3.zero){
 			UpdateLookAt(moveVector, dT, turnSpeed);
-
-			transform.Translate(moveVector*curMoveSpeed*dT);
+			GetComponent<Rigidbody>().MovePosition(transform.position+moveVector*curMoveSpeed*dT);
 		}
 	}
 }

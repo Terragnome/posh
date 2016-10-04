@@ -22,7 +22,6 @@ public class Usable : MonoBehaviour {
 
 	public void FillWith(Liftable liftable) {
 		contents = liftable;
-		Debug.Log("Filled");
 	}
 
 	public void Clear() {

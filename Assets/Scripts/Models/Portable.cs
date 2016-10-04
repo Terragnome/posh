@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Liftable : MonoBehaviour {
-	Usable container = null;
+public class Portable : MonoBehaviour {
+	Container container = null;
 
 	// Use this for initialization
 	void Start () {
@@ -25,8 +25,8 @@ public class Liftable : MonoBehaviour {
 		rb.isKinematic = true;
 	}
 
-	public void DropOn(Usable usable) {
-		container = usable;
+	public void DropOn(Container targetContainer) {
+		container = targetContainer;
 		GetComponent<Rigidbody>().MovePosition(container.transform.position+Vector3.up*container.transform.lossyScale.y);
 	}
 

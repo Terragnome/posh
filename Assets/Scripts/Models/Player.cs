@@ -15,7 +15,7 @@ public class Player : MonoBehaviour {
 
 	public float liftDistanceSquared = 1.5f*1.5f;
 	public float liftAngle = 45f;
-	Liftable liftTarget = null;
+	Portable liftTarget = null;
 
 	public float useDistanceSquared = 1.5f*1.5f;
 	public float useAngle = 45f;
@@ -55,7 +55,6 @@ public class Player : MonoBehaviour {
 
         Vector3 pushDir = new Vector3(hit.moveDirection.x, 0, hit.moveDirection.z);
         body.velocity = pushDir*pushForce;
-        Debug.Log(pushDir);
 	}
 
 	Vector2 ToVector2(Vector3 v) {
@@ -80,8 +79,7 @@ public class Player : MonoBehaviour {
 		Usable closestUsable = null;
 		foreach(Usable curUsable in usables){
 			if(
-				!curUsable.isFilled
-				&& DistanceSquared(curUsable.transform.position) <= useDistanceSquared
+				DistanceSquared(curUsable.transform.position) <= useDistanceSquared
 				&& IsFacing(curUsable.transform.position, useAngle)
 			){
 				closestUsable = curUsable;
@@ -90,18 +88,33 @@ public class Player : MonoBehaviour {
         return closestUsable;
 	}
 
-	Liftable GetClosestLiftable(float liftDistance) {
-		Liftable[] liftables = Object.FindObjectsOfType<Liftable>();
-		Liftable closestLiftable = null;
-		foreach(Liftable curLiftable in liftables){
+	Container GetClosestContainer(float useDistance) {
+		Container[] containers = Object.FindObjectsOfType<Container>();
+		Container closestContainer = null;
+		foreach(Container curContainer in containers){
 			if(
-				DistanceSquared(curLiftable.transform.position) <= liftDistanceSquared
-				&& IsFacing(curLiftable.transform.position, liftAngle)
+				!curContainer.isFilled
+				&& DistanceSquared(curContainer.transform.position) <= useDistanceSquared
+				&& IsFacing(curContainer.transform.position, useAngle)
 			){
-				closestLiftable = curLiftable;
+				closestContainer = curContainer;
 			}
         }
-        return closestLiftable;
+        return closestContainer;
+	}
+
+	Portable GetClosestPortable(float liftDistance) {
+		Portable[] portables = Object.FindObjectsOfType<Portable>();
+		Portable closestPortable = null;
+		foreach(Portable curPortable in portables){
+			if(
+				DistanceSquared(curPortable.transform.position) <= liftDistanceSquared
+				&& IsFacing(curPortable.transform.position, liftAngle)
+			){
+				closestPortable = curPortable;
+			}
+        }
+        return closestPortable;
 	}
 
 	void UpdateLookAt(Vector3 lookVector, float dT, float lookSpeed=1f) {
@@ -151,16 +164,16 @@ public class Player : MonoBehaviour {
 		bool checkLift = Input.GetKeyDown(KeyCode.Space);
 		if(checkLift){
 			if( liftTarget != null ){
-				Usable closestUsable = GetClosestUsable(useLiftedDistanceSquared);
-				if(closestUsable != null){
-					closestUsable.FillWith(liftTarget);
-					liftTarget.DropOn(closestUsable);
+				Container closestContainer = GetClosestContainer(useLiftedDistanceSquared);
+				if(closestContainer != null){
+					closestContainer.FillWith(liftTarget);
+					liftTarget.DropOn(closestContainer);
 				}else{
 					liftTarget.Drop();
 				}
 				liftTarget = null;
 			}else{
-				Liftable curTarget = GetClosestLiftable(liftDistanceSquared);
+				Portable curTarget = GetClosestPortable(liftDistanceSquared);
 				if(curTarget){
 					curTarget.Lift();
 					liftTarget = curTarget;

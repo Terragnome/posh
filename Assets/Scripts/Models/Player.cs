@@ -14,14 +14,14 @@ public class Player : MonoBehaviour {
 	public float pushForce = 5f;
 
 	public float liftDistanceSquared = Mathf.Pow(2f, 2);
-	public float liftAngle = 45f;
+	public float liftAngle = 60f;
 	Portable liftTarget = null;
 	bool isLifting = false;
 
 	public float dropDistanceSquared = Mathf.Pow(3f, 2);
 
 	public float useDistanceSquared = Mathf.Pow(2f, 2);
-	public float useAngle = 45f;
+	public float useAngle = 60f;
 	public Usable useTarget = null;
 	bool isUsing = false;
 
@@ -184,7 +184,17 @@ public class Player : MonoBehaviour {
 		}
 
 		if(liftTarget != null){
-			liftTarget.GetComponent<Rigidbody>().MovePosition(avatarLiftPosition);
+			Rigidbody liftRb = liftTarget.GetComponent<Rigidbody>();
+
+			Quaternion rotationA = avatar.transform.rotation * Quaternion.Euler(0, 90, 0);
+			float angleA = Quaternion.Angle(liftRb.transform.rotation, rotationA);
+
+			Quaternion rotationB = avatar.transform.rotation * Quaternion.Euler(0, -90, 0);
+			float angleB = Quaternion.Angle(liftRb.transform.rotation, rotationB);
+
+			Quaternion targetRotation = angleA < angleB ? rotationA : rotationB;
+			liftRb.transform.rotation = targetRotation;
+			liftRb.MovePosition(avatarLiftPosition);
 		}
 	}
 

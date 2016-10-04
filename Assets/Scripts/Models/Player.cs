@@ -16,11 +16,13 @@ public class Player : MonoBehaviour {
 
 	[SerializeField]
 	float liftDistance = 2.5f;
+	float liftAngle = 45f;
 	[SerializeField]
 	Liftable liftTarget = null;
 
 	[SerializeField]
 	float useDistance = 1.5f;
+	float useAngle = 45f;
 	[SerializeField]
 	float useLiftedDistance = 2.5f;
 	
@@ -56,24 +58,42 @@ public class Player : MonoBehaviour {
 		return distVector.sqrMagnitude <= distance*distance;
 	}
 
+	bool InFrontOf(Vector3 position, float maxAngle){
+		float angle = Vector3.Angle(
+			avatar.transform.position-position,
+			avatar.transform.forward
+		);
+		return angle <= maxAngle;
+	}
+
 	Usable GetClosestUsable(float useDistance) {
 		GameObject[] usables = GameObject.FindGameObjectsWithTag(TagType.USABLE);
 		Usable curUsable;
+
 		foreach(GameObject curGO in usables){
 			curUsable = curGO.GetComponent<Usable>();
-			if(!curUsable.isFilled && CloseEnough(curGO.transform.position, useDistance)){
-				return curUsable;
-			}
+			if(
+				!curUsable.isFilled
+				&& CloseEnough(curGO.transform.position, useDistance)
+				&& InFrontOf(curGO.transform.position, useAngle)
+			)return curUsable;
         }
         return null;
 	}
 
 	Liftable GetClosestLiftable(float liftDistance) {
 		GameObject[] liftables = GameObject.FindGameObjectsWithTag(TagType.LIFTABLE);
+		
+		// Vector3 directionToTarget = transform.position - enemy.position;
+		// float angel = Vector3.Angel(transform.forward, directionToTarget);
+		// if (Mathf.Abs(angel) > 90)
+		//     Debug.Log("target is behind me");
+
 		foreach(GameObject curGO in liftables){
-			if(CloseEnough(curGO.transform.position, liftDistance)){
-				return curGO.GetComponent<Liftable>();
-			}
+			if(
+				CloseEnough(curGO.transform.position, liftDistance)
+				&& InFrontOf(curGO.transform.position, liftAngle)
+			) return curGO.GetComponent<Liftable>();
         }
         return null;
 	}
@@ -96,7 +116,10 @@ public class Player : MonoBehaviour {
 		bool checkUse = Input.GetKey(KeyCode.F);
 		if(checkUse){
 			if( useTarget != null ){				
-				if(CloseEnough(useTarget.transform.position, useDistance)){
+				if(
+					CloseEnough(useTarget.transform.position, useDistance)
+					&& InFrontOf(useTarget.transform.position, useAngle)
+				){
 					useTarget.Use(dT);
 					UpdateLookAtPosition(useTarget.transform.position, dT, turnSpeed);
 				}else{

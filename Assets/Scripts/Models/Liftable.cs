@@ -30,7 +30,7 @@ public class Liftable : MonoBehaviour {
 
 	public void DropOn(Usable usable) {
 		container = usable;
-		transform.position = container.transform.position+Vector3.up;
+		transform.position = container.transform.position+Vector3.up*container.transform.lossyScale.y;
 	}
 
 	public void Drop() {

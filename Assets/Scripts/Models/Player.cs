@@ -2,32 +2,26 @@
 using System.Collections;
 
 public class Player : MonoBehaviour {
-	[SerializeField]
-	float walkSpeed = 3f;
-	[SerializeField]
-	float turnSpeed = 7f;
-	[SerializeField]
-	float dashSpeed = 6f;
-	[SerializeField]
-	float dashDuration = 0.3f;
-	[SerializeField]
+	float gravity = 9.8f;
+
+	public float walkSpeed = 3f;
+	public float turnSpeed = 7f;
+	public float dashSpeed = 6f;
+	public float dashDuration = 0.3f;
 	float dashTimeLeft = 0f;
 	bool isDashing = false;
 
-	[SerializeField]
-	float liftDistanceSquared = 1.5f*1.5f;
-	float liftAngle = 45f;
-	[SerializeField]
+	public float pushForce = 5f;
+
+	public float liftDistanceSquared = 1.5f*1.5f;
+	public float liftAngle = 45f;
 	Liftable liftTarget = null;
 
-	[SerializeField]
-	float useDistanceSquared = 1.5f*1.5f;
-	float useAngle = 45f;
-	[SerializeField]
-	float useLiftedDistanceSquared = 2.5f*2.5f;
+	public float useDistanceSquared = 1.5f*1.5f;
+	public float useAngle = 45f;
+	public float useLiftedDistanceSquared = 2.5f*2.5f;
 	
-	[SerializeField]
-	Usable useTarget = null;
+	public Usable useTarget = null;
 	bool isUsing = false;
 
 	public GameObject avatar {
@@ -35,7 +29,7 @@ public class Player : MonoBehaviour {
 	}
 
 	public Vector3 avatarLiftPosition {
-		get { return avatar.transform.position-avatar.transform.forward+Vector3.up; }
+		get { return avatar.transform.position-avatar.transform.forward*1.2f+Vector3.up; }
 	}
 
   	// Use this for initialization
@@ -53,11 +47,16 @@ public class Player : MonoBehaviour {
 		UpdateMovement(dT);
 	}
 
-	// void OnCollisionEnter(Collision collision) {
- //        if(collision.gameObject.GetComponent<Usable>() != null) {
- //        	collision.gameObject.GetComponent<Rigidbody>().isKinematic = false;
- //        }
-	// }
+	void OnControllerColliderHit(ControllerColliderHit hit) {
+		Rigidbody body = hit.collider.attachedRigidbody;
+        if(body == null || body.isKinematic) return;
+
+        if(hit.moveDirection.y < -0.3F) return;
+
+        Vector3 pushDir = new Vector3(hit.moveDirection.x, 0, hit.moveDirection.z);
+        body.velocity = pushDir*pushForce;
+        Debug.Log(pushDir);
+	}
 
 	Vector2 ToVector2(Vector3 v) {
 		return new Vector2(v.x, v.z);
@@ -106,12 +105,11 @@ public class Player : MonoBehaviour {
 	}
 
 	void UpdateLookAt(Vector3 lookVector, float dT, float lookSpeed=1f) {
-		GetComponent<Rigidbody>().MoveRotation(
-			Quaternion.Lerp(
-				avatar.transform.rotation,
-				Quaternion.LookRotation(lookVector*-1, Vector3.up),
-				lookSpeed*dT
-			)
+		// GetComponent<Rigidbody>().MoveRotation(
+		avatar.transform.rotation = Quaternion.Lerp(
+			avatar.transform.rotation,
+			Quaternion.LookRotation(lookVector*-1, Vector3.up),
+			lookSpeed*dT
 		);
 	}
 
@@ -209,7 +207,12 @@ public class Player : MonoBehaviour {
 
 		if(moveVector != Vector3.zero){
 			UpdateLookAt(moveVector, dT, turnSpeed);
-			GetComponent<Rigidbody>().MovePosition(transform.position+moveVector*curMoveSpeed*dT);
 		}
+
+		Vector3 fullMoveVector = moveVector*curMoveSpeed;
+		fullMoveVector += Vector3.down*gravity;
+
+		// GetComponent<Rigidbody>().MovePosition(transform.position+moveVector*curMoveSpeed*dT);
+		GetComponent<CharacterController>().Move(fullMoveVector*dT);
 	}
 }

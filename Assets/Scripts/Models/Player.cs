@@ -15,16 +15,16 @@ public class Player : MonoBehaviour {
 	bool isDashing = false;
 
 	[SerializeField]
-	float liftDistance = 2.5f;
+	float liftDistanceSquared = 1.5f*1.5f;
 	float liftAngle = 45f;
 	[SerializeField]
 	Liftable liftTarget = null;
 
 	[SerializeField]
-	float useDistance = 1.5f;
+	float useDistanceSquared = 1.5f*1.5f;
 	float useAngle = 45f;
 	[SerializeField]
-	float useLiftedDistance = 2.5f;
+	float useLiftedDistanceSquared = 2.5f*2.5f;
 	
 	[SerializeField]
 	Usable useTarget = null;
@@ -53,49 +53,57 @@ public class Player : MonoBehaviour {
 		UpdateMovement(dT);
 	}
 
-	bool CloseEnough(Vector3 position, float distance) {
-		Vector3 distVector = transform.position-position;
-		return distVector.sqrMagnitude <= distance*distance;
+	void OnCollisionEnter(Collision collision) {
+        if(collision.gameObject.GetComponent<Usable>() != null) {
+        	collision.gameObject.GetComponent<Rigidbody>().isKinematic = false;
+        }
 	}
 
-	bool InFrontOf(Vector3 position, float maxAngle){
-		float angle = Vector3.Angle(
-			avatar.transform.position-position,
-			avatar.transform.forward
+	Vector2 ToVector2(Vector3 v) {
+		return new Vector2(v.x, v.z);
+	}
+
+	float DistanceSquared(Vector3 targetPosition) {
+		Vector2 distVector = ToVector2(avatar.transform.position) - ToVector2(targetPosition);
+		Debug.Log(distVector.sqrMagnitude);
+		return distVector.sqrMagnitude;
+	}
+
+	bool IsFacing(Vector3 position, float maxAngle){
+		float angle = Vector2.Angle(
+			ToVector2(avatar.transform.position) - ToVector2(position),
+			ToVector2(avatar.transform.forward)
 		);
 		return angle <= maxAngle;
 	}
 
 	Usable GetClosestUsable(float useDistance) {
-		GameObject[] usables = GameObject.FindGameObjectsWithTag(TagType.USABLE);
-		Usable curUsable;
-
-		foreach(GameObject curGO in usables){
-			curUsable = curGO.GetComponent<Usable>();
+		Usable[] usables = Object.FindObjectsOfType<Usable>();
+		Usable closestUsable = null;
+		foreach(Usable curUsable in usables){
 			if(
 				!curUsable.isFilled
-				&& CloseEnough(curGO.transform.position, useDistance)
-				&& InFrontOf(curGO.transform.position, useAngle)
-			)return curUsable;
+				&& DistanceSquared(curUsable.transform.position) <= useDistanceSquared
+				&& IsFacing(curUsable.transform.position, useAngle)
+			){
+				closestUsable = curUsable;
+			}
         }
-        return null;
+        return closestUsable;
 	}
 
 	Liftable GetClosestLiftable(float liftDistance) {
-		GameObject[] liftables = GameObject.FindGameObjectsWithTag(TagType.LIFTABLE);
-		
-		// Vector3 directionToTarget = transform.position - enemy.position;
-		// float angel = Vector3.Angel(transform.forward, directionToTarget);
-		// if (Mathf.Abs(angel) > 90)
-		//     Debug.Log("target is behind me");
-
-		foreach(GameObject curGO in liftables){
+		Liftable[] liftables = Object.FindObjectsOfType<Liftable>();
+		Liftable closestLiftable = null;
+		foreach(Liftable curLiftable in liftables){
 			if(
-				CloseEnough(curGO.transform.position, liftDistance)
-				&& InFrontOf(curGO.transform.position, liftAngle)
-			) return curGO.GetComponent<Liftable>();
+				DistanceSquared(curLiftable.transform.position) <= liftDistanceSquared
+				&& IsFacing(curLiftable.transform.position, liftAngle)
+			){
+				closestLiftable = curLiftable;
+			}
         }
-        return null;
+        return closestLiftable;
 	}
 
 	void UpdateLookAt(Vector3 lookVector, float dT, float lookSpeed=1f) {
@@ -107,7 +115,7 @@ public class Player : MonoBehaviour {
 	}
 
 	void UpdateLookAtPosition(Vector3 position, float dT, float lookSpeed=1f) {
-		Vector3 lookVector = Vector3.Normalize(position-transform.position);
+		Vector3 lookVector = Vector3.Normalize(position-avatar.transform.position);
 		lookVector.y = 0f;
 		UpdateLookAt(lookVector, dT, lookSpeed);
 	}
@@ -117,8 +125,8 @@ public class Player : MonoBehaviour {
 		if(checkUse){
 			if( useTarget != null ){				
 				if(
-					CloseEnough(useTarget.transform.position, useDistance)
-					&& InFrontOf(useTarget.transform.position, useAngle)
+					DistanceSquared(useTarget.transform.position) < useDistanceSquared
+					&& IsFacing(useTarget.transform.position, useAngle)
 				){
 					useTarget.Use(dT);
 					UpdateLookAtPosition(useTarget.transform.position, dT, turnSpeed);
@@ -128,7 +136,7 @@ public class Player : MonoBehaviour {
 			}
 
 			if( useTarget == null){
-				Usable curTarget = GetClosestUsable(useDistance);
+				Usable curTarget = GetClosestUsable(useDistanceSquared);
 				if(curTarget){
 					useTarget = curTarget;
 				}
@@ -144,7 +152,7 @@ public class Player : MonoBehaviour {
 		bool checkLift = Input.GetKeyDown(KeyCode.Space);
 		if(checkLift){
 			if( liftTarget != null ){
-				Usable closestUsable = GetClosestUsable(useLiftedDistance);
+				Usable closestUsable = GetClosestUsable(useLiftedDistanceSquared);
 				if(closestUsable != null){
 					closestUsable.FillWith(liftTarget);
 					liftTarget.DropOn(closestUsable);
@@ -153,7 +161,7 @@ public class Player : MonoBehaviour {
 				}
 				liftTarget = null;
 			}else{
-				Liftable curTarget = GetClosestLiftable(liftDistance);
+				Liftable curTarget = GetClosestLiftable(liftDistanceSquared);
 				if(curTarget){
 					curTarget.Lift();
 					liftTarget = curTarget;

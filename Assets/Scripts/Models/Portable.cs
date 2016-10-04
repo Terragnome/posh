@@ -31,6 +31,7 @@ public class Portable : MonoBehaviour {
 	}
 
 	public void Drop() {
+		rb.velocity = Vector3.zero;
 		rb.isKinematic = false;
 		rb.useGravity = true;
 	}

@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class Player : MonoBehaviour {
-	float gravity = 9.8f;
+	const float GRAVITY = 9.8f;
 
 	public float walkSpeed = 3f;
 	public float turnSpeed = 7f;
@@ -13,14 +13,15 @@ public class Player : MonoBehaviour {
 
 	public float pushForce = 5f;
 
-	public float liftDistanceSquared = 1.5f*1.5f;
+	public float liftDistanceSquared = Mathf.Pow(2f, 2);
 	public float liftAngle = 45f;
 	Portable liftTarget = null;
+	bool isLifting = false;
 
-	public float useDistanceSquared = 1.5f*1.5f;
+	public float dropDistanceSquared = Mathf.Pow(3f, 2);
+
+	public float useDistanceSquared = Mathf.Pow(2f, 2);
 	public float useAngle = 45f;
-	public float useLiftedDistanceSquared = 2.5f*2.5f;
-	
 	public Usable useTarget = null;
 	bool isUsing = false;
 
@@ -94,7 +95,7 @@ public class Player : MonoBehaviour {
 		foreach(Container curContainer in containers){
 			if(
 				!curContainer.isFilled
-				&& DistanceSquared(curContainer.transform.position) <= useDistanceSquared
+				&& DistanceSquared(curContainer.transform.position) <= dropDistanceSquared
 				&& IsFacing(curContainer.transform.position, useAngle)
 			){
 				closestContainer = curContainer;
@@ -164,7 +165,7 @@ public class Player : MonoBehaviour {
 		bool checkLift = Input.GetKeyDown(KeyCode.Space);
 		if(checkLift){
 			if( liftTarget != null ){
-				Container closestContainer = GetClosestContainer(useLiftedDistanceSquared);
+				Container closestContainer = GetClosestContainer(dropDistanceSquared);
 				if(closestContainer != null){
 					closestContainer.FillWith(liftTarget);
 					liftTarget.DropOn(closestContainer);
@@ -177,6 +178,7 @@ public class Player : MonoBehaviour {
 				if(curTarget){
 					curTarget.Lift();
 					liftTarget = curTarget;
+					isLifting = true;
 				}
 			}
 		}
@@ -223,9 +225,8 @@ public class Player : MonoBehaviour {
 		}
 
 		Vector3 fullMoveVector = moveVector*curMoveSpeed;
-		fullMoveVector += Vector3.down*gravity;
+		fullMoveVector += Vector3.down*GRAVITY;
 
-		// GetComponent<Rigidbody>().MovePosition(transform.position+moveVector*curMoveSpeed*dT);
 		GetComponent<CharacterController>().Move(fullMoveVector*dT);
 	}
 }

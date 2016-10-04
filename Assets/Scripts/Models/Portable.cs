@@ -21,18 +21,18 @@ public class Portable : MonoBehaviour {
 			container.Clear();
 			container = null;
 		}
+		rb.isKinematic = false;
 		rb.useGravity = false;
-		// rb.isKinematic = true;
 	}
 
 	public void DropOn(Container targetContainer) {
 		container = targetContainer;
-		GetComponent<Rigidbody>().MovePosition(container.transform.position+Vector3.up*container.transform.lossyScale.y);
+		rb.isKinematic = true;
+		rb.MovePosition(container.transform.position+Vector3.up*container.transform.lossyScale.y);
 	}
 
 	public void Drop() {
 		rb.velocity = Vector3.zero;
-		// rb.isKinematic = false;
 		rb.useGravity = true;
 	}
 }

@@ -22,7 +22,7 @@ public class Portable : MonoBehaviour {
 			container = null;
 		}
 		rb.useGravity = false;
-		rb.isKinematic = true;
+		// rb.isKinematic = true;
 	}
 
 	public void DropOn(Container targetContainer) {
@@ -32,7 +32,7 @@ public class Portable : MonoBehaviour {
 
 	public void Drop() {
 		rb.velocity = Vector3.zero;
-		rb.isKinematic = false;
+		// rb.isKinematic = false;
 		rb.useGravity = true;
 	}
 }

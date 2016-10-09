@@ -5,13 +5,14 @@ public class Usable : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		Collider initCollider = col;
 	}
 	
 	// Update is called once per frame
 	void Update () {
 	}
 
-	Collider collider {
+	Collider col {
 		get {
 			BoxCollider boxCollider = GetComponent<BoxCollider>();
 			if(boxCollider == null){

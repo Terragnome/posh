@@ -6,15 +6,15 @@ public class Portable : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		Rigidbody rigidBody = rb;
-		Collider sphereCollider = collider;
+		Rigidbody initRigidbody = rb;
+		Collider initCollider = col;
 	}
 
 	// Update is called once per frame
 	void Update () {
 	}
 
-	Collider collider {
+	Collider col {
 		get {
 			SphereCollider sphereCollider = GetComponent<SphereCollider>();
 			if(sphereCollider == null){

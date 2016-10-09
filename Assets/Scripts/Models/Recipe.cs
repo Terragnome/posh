@@ -10,6 +10,6 @@ public class Recipe : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
+	 
 	}
 }

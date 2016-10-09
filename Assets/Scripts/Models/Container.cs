@@ -1,8 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Container : MonoBehaviour {
-	Portable contents = null;
+	public int maxContents = 1;
+	public List<Portable> contents = new List<Portable>();
+	public List<Ingredient> allowedIngredients = new List<Ingredient>();
 
 	// Use this for initialization
 	void Start () {
@@ -13,14 +16,14 @@ public class Container : MonoBehaviour {
 	}
 
 	public bool isFilled {
-		get { return contents != null; }
+		get { return contents.Count >= maxContents; }
 	}
 
 	public void FillWith(Portable portable) {
-		contents = portable;
+		contents.Add(portable);
 	}
 
 	public void Clear() {
-		contents = null;
+		contents.Clear();
 	}
 }

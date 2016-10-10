@@ -18,7 +18,7 @@ public class Player : MonoBehaviour {
 	Portable liftTarget = null;
 	bool isLifting = false;
 
-	public float dropDistanceSquared = Mathf.Pow(3f, 2);
+	public float dropDistanceSquared = Mathf.Pow(2f, 2);
 
 	public float useDistanceSquared = Mathf.Pow(2f, 2);
 	public float useAngle = 60f;
@@ -30,7 +30,7 @@ public class Player : MonoBehaviour {
 	}
 
 	public Vector3 avatarLiftPosition {
-		get { return avatar.transform.position-avatar.transform.forward*1.2f+Vector3.up; }
+		get { return avatar.transform.position-avatar.transform.forward*0.9f+Vector3.up*0.7f; }
 	}
 
   	// Use this for initialization
@@ -104,7 +104,7 @@ public class Player : MonoBehaviour {
         return closestContainer;
 	}
 
-	Portable GetClosestPortable(float liftDistance) {
+	Portable GetClosestPortable(float liftDistanceSquared) {
 		Generator[] generators = Object.FindObjectsOfType<Generator>();
 		Generator closestGenerator = null;
 		float closestGeneratorDistSquared = liftDistanceSquared;
@@ -133,10 +133,13 @@ public class Player : MonoBehaviour {
 
     if(
     	(
+    		closestGenerator != null
+    		&& closestGenerator.CanGenerate
+    	)
+    	&& (
     		closestPortable == null
     		|| closestGeneratorDistSquared < closestPortableDistSquared
     	)
-    	&& closestGenerator.CanGenerate
     ){
     	Portable newGenerated = closestGenerator.Generate();
     	if(newGenerated != null){
@@ -147,7 +150,6 @@ public class Player : MonoBehaviour {
 	}
 
 	void UpdateLookAt(Vector3 lookVector, float dT, float lookSpeed=1f) {
-		// GetComponent<Rigidbody>().MoveRotation(
 		avatar.transform.rotation = Quaternion.Lerp(
 			avatar.transform.rotation,
 			Quaternion.LookRotation(lookVector*-1, Vector3.up),

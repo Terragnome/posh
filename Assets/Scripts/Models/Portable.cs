@@ -19,7 +19,7 @@ public class Portable : MonoBehaviour {
 			SphereCollider sphereCollider = GetComponent<SphereCollider>();
 			if(sphereCollider == null){
 				sphereCollider = gameObject.AddComponent<SphereCollider>();
-				sphereCollider.radius = 0.5f;
+				sphereCollider.radius = 0.25f;
 			}
 			return sphereCollider;
 		}

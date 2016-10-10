@@ -12,6 +12,10 @@ public class Generator : MonoBehaviour {
 	void Update () {	
 	}
 
+  GameObject portableManager {
+    get { return GameObject.Find("Portables"); }
+  }
+
   Container container {
     get {
       Container curContainer = GetComponent<Container>();
@@ -28,9 +32,10 @@ public class Generator : MonoBehaviour {
     Portable newPortable = null;
     if(!container.isFull){
       Ingredient newIngredient = Object.Instantiate(payload);
+      newIngredient.transform.parent = portableManager.transform;
+
       newPortable = newIngredient.GetComponent<Portable>();
-      Debug.Log(newPortable.transform.position);
-      // newPortable.DropOn(container);
+      newPortable.DropOn(container);
     }
     return newPortable;
   }

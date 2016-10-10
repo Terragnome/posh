@@ -7,18 +7,19 @@ public class Ingredient : MonoBehaviour {
 
   public IngredientType ingredientType;
   public IngredientName ingredientName;
+  public int ingredientProgress = 0;
 
-	// Use this for initialization
-	void Start () {	
-	}
+	void Start () {}
+	void Update () {}
 
-	// Update is called once per frame
-	void Update () {
-	}
+  public bool isPrepared {
+    get { return ingredientProgress >= 100; }
+  }
 
-  bool isUsable {
-    get {
-      return true;
+  public void Prepare(float dT) {
+    if(!isPrepared){
+      ingredientProgress += 1;
+      Debug.Log("TRACE "+this+" ("+ingredientProgress+"%)");
     }
   }
 }

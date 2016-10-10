@@ -4,15 +4,12 @@ using System.Collections;
 public class Portable : MonoBehaviour {
 	public Container container = null;
 
-	// Use this for initialization
 	void Start () {
 		Rigidbody initRigidbody = rb;
 		Collider initCollider = col;
 	}
 
-	// Update is called once per frame
-	void Update () {
-	}
+	void Update () {}
 
 	Collider col {
 		get {

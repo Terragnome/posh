@@ -7,12 +7,11 @@ public class Container : MonoBehaviour {
 	public List<Portable> contents = new List<Portable>();
 	public List<Ingredient> allowedIngredients = new List<Ingredient>();
 
-	// Use this for initialization
-	void Start () {
-	}
+	void Start () {}
+	void Update () {}
 
-	// Update is called once per frame
-	void Update () {
+	public bool isEmpty {
+		get { return contents.Count == 0; }
 	}
 
 	public bool isFull {

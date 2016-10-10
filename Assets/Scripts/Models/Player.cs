@@ -33,11 +33,8 @@ public class Player : MonoBehaviour {
 		get { return avatar.transform.position-avatar.transform.forward*0.9f+Vector3.up*0.7f; }
 	}
 
-  	// Use this for initialization
-	void Start () {
-	}
+	void Start () {}
 
-	// Update is called once per frame
 	void FixedUpdate () {
 		float dT = Time.deltaTime;
 
@@ -165,13 +162,15 @@ public class Player : MonoBehaviour {
 
 	void UpdateUse(float dT) {
 		bool checkUse = Input.GetKey(KeyCode.F);
+		bool isCurrentlyUsing = false;
 		if(checkUse){
 			if( useTarget != null ){				
 				if(
 					DistanceSquared(useTarget.transform.position) < useDistanceSquared
 					&& IsFacing(useTarget.transform.position, useAngle)
+					&& useTarget.isUsable
 				){
-					useTarget.Use(dT);
+					isCurrentlyUsing = useTarget.Use(dT);
 					UpdateLookAtPosition(useTarget.transform.position, dT, turnSpeed);
 				}else{
 					useTarget = null;					
@@ -188,7 +187,7 @@ public class Player : MonoBehaviour {
 			useTarget = null;
 		}
 
-		isUsing = useTarget != null;
+		isUsing = isCurrentlyUsing;
 	}
 
 	void UpdateLift(float dT) {

@@ -2,21 +2,17 @@
 using System.Collections;
 
 public class Generator : MonoBehaviour {
-  static GameObject _portableManager;
+
   public Ingredient payload;
 
-	// Use this for initialization
-	void Start () {
-	}
+	void Start () {}
+  void Update () {}
 
-	// Update is called once per frame
-	void Update () {	
-	}
-
-  GameObject portableManager {
+  static GameObject _portablesManager;
+  GameObject portablesManager {
     get {
-      if(_portableManager == null){ _portableManager = GameObject.Find("Portables"); }
-      return _portableManager;
+      if(_portablesManager == null){ _portablesManager = GameObject.Find("Portables"); }
+      return _portablesManager;
     }
   }
 
@@ -36,7 +32,7 @@ public class Generator : MonoBehaviour {
     Portable newPortable = null;
     if(!container.isFull){
       Ingredient newIngredient = Object.Instantiate(payload);
-      newIngredient.transform.parent = portableManager.transform;
+      newIngredient.transform.parent = portablesManager.transform;
 
       newPortable = newIngredient.GetComponent<Portable>();
       newPortable.DropOn(container);

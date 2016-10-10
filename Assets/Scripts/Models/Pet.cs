@@ -8,11 +8,6 @@ public class Pet : MonoBehaviour {
   public PetType petType;
   public PetName petName;
 
-	// Use this for initialization
-	void Start () {
-	}
-
-	// Update is called once per frame
-	void Update () {
-	}
+	void Start () {}
+	void Update () {}
 }

@@ -3,13 +3,20 @@ using System.Collections;
 
 public class Usable : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-		// Collider initCollider = col;
-	}
-	
-	// Update is called once per frame
-	void Update () {
+	void Start () {}
+	void Update () {}
+
+	public bool isUsable {
+		get {
+			if(container.isEmpty){ return false; }
+
+			foreach(Portable curPortable in container.contents){
+				Ingredient curIngredient = curPortable.GetComponent<Ingredient>();
+				if(curIngredient != null && !curIngredient.isPrepared) { return true; }
+			}
+
+			return false;
+		}
 	}
 
 	Collider col {
@@ -23,12 +30,22 @@ public class Usable : MonoBehaviour {
 		}
 	}
 
-	Container cont {
+	Container container {
 		get { return GetComponent<Container>(); }
 	}
 
-	public void Use(float dT) {
+	public bool Use(float dT) {
+		bool isUsing = false;
+		foreach(Portable curPortable in container.contents){
+			Ingredient curIngredient = curPortable.GetComponent<Ingredient>();
+			if(curIngredient != null && !curIngredient.isPrepared) {
+				curIngredient.Prepare(dT);
+				isUsing = true;
+			}
+		}
+
 		UpdateProgress(dT);
+		return isUsing;
 	}
 
 	void UpdateProgress(float dT){

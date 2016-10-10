@@ -5,7 +5,7 @@ public class Usable : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		Collider initCollider = col;
+		// Collider initCollider = col;
 	}
 	
 	// Update is called once per frame

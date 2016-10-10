@@ -52,11 +52,7 @@ public class Portable : MonoBehaviour {
 	public void DropOn(Container targetContainer) {
 		container = targetContainer;
 		rb.isKinematic = true;
-		Vector3 newPosition = new Vector3(
-			container.transform.position.x,
-			container.transform.lossyScale.y,
-			container.transform.position.z
-		);
+		Vector3 newPosition = container.transform.position+Vector3.up*container.transform.lossyScale.y;
 		rb.MovePosition(newPosition);
 	}
 

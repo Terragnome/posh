@@ -15,4 +15,10 @@ public class Ingredient : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 	}
+
+  bool isUsable {
+    get {
+      return true;
+    }
+  }
 }

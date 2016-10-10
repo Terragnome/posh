@@ -23,6 +23,10 @@ public class Usable : MonoBehaviour {
 		}
 	}
 
+	Container cont {
+		get { return GetComponent<Container>(); }
+	}
+
 	public void Use(float dT) {
 		UpdateProgress(dT);
 	}

@@ -2,6 +2,7 @@
 using System.Collections;
 
 public class Generator : MonoBehaviour {
+  static GameObject _portableManager;
   public Ingredient payload;
 
 	// Use this for initialization
@@ -13,7 +14,10 @@ public class Generator : MonoBehaviour {
 	}
 
   GameObject portableManager {
-    get { return GameObject.Find("Portables"); }
+    get {
+      if(_portableManager == null){ _portableManager = GameObject.Find("Portables"); }
+      return _portableManager;
+    }
   }
 
   Container container {

@@ -32,6 +32,7 @@ public class Generator : MonoBehaviour {
     Portable newPortable = null;
     if(!container.isFull){
       Ingredient newIngredient = Object.Instantiate(payload);
+      // newIngredient.gameObject.SetActive(false);
       newIngredient.transform.parent = portablesManager.transform;
 
       newPortable = newIngredient.GetComponent<Portable>();

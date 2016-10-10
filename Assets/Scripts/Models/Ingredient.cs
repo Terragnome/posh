@@ -9,8 +9,10 @@ public class Ingredient : MonoBehaviour {
   public IngredientName ingredientName;
   public int ingredientProgress = 0;
 
-	void Start () {}
-	void Update () {}
+	void Start () {
+  }
+	void Update () {
+  }
 
   public bool isPrepared {
     get { return ingredientProgress >= 100; }

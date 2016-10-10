@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class Portable : MonoBehaviour {
-	Container container = null;
+	public Container container = null;
 
 	// Use this for initialization
 	void Start () {
@@ -52,7 +52,12 @@ public class Portable : MonoBehaviour {
 	public void DropOn(Container targetContainer) {
 		container = targetContainer;
 		rb.isKinematic = true;
-		rb.MovePosition(container.transform.position+Vector3.up*container.transform.lossyScale.y);
+		Vector3 newPosition = new Vector3(
+			container.transform.position.x,
+			container.transform.lossyScale.y,
+			container.transform.position.z
+		);
+		rb.MovePosition(newPosition);
 	}
 
 	public void Drop() {

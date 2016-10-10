@@ -20,7 +20,7 @@ public class Container : MonoBehaviour {
 	}
 
 	public void FillWith(Portable portable) {
-		contents.Add(portable);
+		if(!isFilled){ contents.Add(portable); }
 	}
 
 	public void Clear() {

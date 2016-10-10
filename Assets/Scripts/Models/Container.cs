@@ -23,6 +23,7 @@ public class Container : MonoBehaviour {
 	}
 
 	public void Clear() {
+		foreach(Portable curPortable in contents){ curPortable.Drop(); }
 		contents.Clear();
 	}
 }

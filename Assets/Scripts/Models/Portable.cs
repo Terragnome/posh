@@ -55,7 +55,7 @@ public class Portable : MonoBehaviour {
 			container.transform.position.y+container.transform.lossyScale.y,
 			container.transform.position.z
 		);
-		rb.MovePosition(newPosition);
+		rb.transform.position = newPosition;
 	}
 
 	public void Drop() {

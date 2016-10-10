@@ -15,12 +15,12 @@ public class Container : MonoBehaviour {
 	void Update () {
 	}
 
-	public bool isFilled {
+	public bool isFull {
 		get { return contents.Count >= maxContents; }
 	}
 
 	public void FillWith(Portable portable) {
-		if(!isFilled){ contents.Add(portable); }
+		if(!isFull){ contents.Add(portable); }
 	}
 
 	public void Clear() {

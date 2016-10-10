@@ -94,7 +94,7 @@ public class Player : MonoBehaviour {
 		Container closestContainer = null;
 		foreach(Container curContainer in containers){
 			if(
-				!curContainer.isFilled
+				!curContainer.isFull
 				&& DistanceSquared(curContainer.transform.position) <= dropDistanceSquared
 				&& IsFacing(curContainer.transform.position, useAngle)
 			){
@@ -105,17 +105,45 @@ public class Player : MonoBehaviour {
 	}
 
 	Portable GetClosestPortable(float liftDistance) {
+		Generator[] generators = Object.FindObjectsOfType<Generator>();
+		Generator closestGenerator = null;
+		float closestGeneratorDistSquared = liftDistanceSquared;
+		foreach(Generator curGenerator in generators){
+			float curGeneratorDistSquared = DistanceSquared(curGenerator.transform.position);
+			if(
+				curGeneratorDistSquared <= closestGeneratorDistSquared
+				&& IsFacing(curGenerator.transform.position, liftAngle)
+			){
+				closestGenerator = curGenerator;
+			}
+		}
+
 		Portable[] portables = Object.FindObjectsOfType<Portable>();
 		Portable closestPortable = null;
+		float closestPortableDistSquared = liftDistanceSquared;
 		foreach(Portable curPortable in portables){
+			float curPortableDistSquared = DistanceSquared(curPortable.transform.position);
 			if(
-				DistanceSquared(curPortable.transform.position) <= liftDistanceSquared
+				curPortableDistSquared <= closestPortableDistSquared
 				&& IsFacing(curPortable.transform.position, liftAngle)
 			){
 				closestPortable = curPortable;
 			}
-        }
-        return closestPortable;
+    }
+
+    if(
+    	(
+    		closestPortable == null
+    		|| closestGeneratorDistSquared < closestPortableDistSquared
+    	)
+    	&& closestGenerator.CanGenerate
+    ){
+    	Portable newGenerated = closestGenerator.Generate();
+    	if(newGenerated != null){
+    		return newGenerated;
+    	}
+    }
+    return closestPortable;
 	}
 
 	void UpdateLookAt(Vector3 lookVector, float dT, float lookSpeed=1f) {
@@ -176,8 +204,7 @@ public class Player : MonoBehaviour {
 			}else{
 				Portable curTarget = GetClosestPortable(liftDistanceSquared);
 				if(curTarget){
-					curTarget.Lift();
-					liftTarget = curTarget;
+					liftTarget = curTarget.Lift();
 					isLifting = true;
 				}
 			}

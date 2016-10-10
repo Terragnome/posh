@@ -40,13 +40,14 @@ public class Portable : MonoBehaviour {
 		}
 	}
 
-	public void Lift() {
+	public Portable Lift() {
 		if(container){
 			container.Clear();
 			container = null;
 		}
 		rb.isKinematic = false;
 		rb.useGravity = false;
+		return this;
 	}
 
 	public void DropOn(Container targetContainer) {

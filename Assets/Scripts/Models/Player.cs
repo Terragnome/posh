@@ -17,6 +17,7 @@ public class Player : MonoBehaviour {
 	public float liftAngle = 60f;
 	Portable liftTarget = null;
 	bool isLifting = false;
+	bool processLift = false;
 
 	public float dropDistanceSquared = Mathf.Pow(2f, 2);
 
@@ -35,7 +36,7 @@ public class Player : MonoBehaviour {
 
 	void Start () {}
 
-	void FixedUpdate () {
+	void Update () {
 		float dT = Time.deltaTime;
 
 		UpdateUse(dT);
